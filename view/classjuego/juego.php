@@ -43,13 +43,17 @@
            var SegmentoSeleccionado = miRuleta.getIndicatedSegment();
            var frutas = ["Confite", "Premio 1", "Premio 2", "Premio 3","Premio 4","Premio 5","Premio 6"];
            var a = frutas.indexOf(SegmentoSeleccionado.text);
-           alert("Elemento seleccionado:" + a + "!");
 
 
            miRuleta.stopAnimation(false);
            miRuleta.rotationAngle = 0;
            miRuleta.draw();
            dibujarIndicador();
+           console.log(a);
+           alertify.alert("Premio","Elemento seleccionado: " + a + "!", function(){
+            alertify.success('Ok');
+            location.href = '?c=classjuego&m=ganaPremio&id='+a;
+           });
        }
        function dibujarIndicador() {
             var ctx = miRuleta.ctx;
@@ -69,5 +73,4 @@
     ctx.fill();                 
        }
  </script>
- 
 </div>

@@ -57,6 +57,33 @@ class classjuego  extends Conexion
 		$this->conexion->consultaSimple($sql);
 	}
 
+	public function guardarfactura()
+	{
+		$sql = "CALL sp_cd_factura_guardar('$this->cedula','$this->factura');";
+		$this->conexion->consultaSimple($sql);
+	}
+
+	public function verificarCliente($cedula){
+		$sql = "SELECT fn_verificar_cliente('".$cedula."');";
+		$result = $this->conexion->consultaRetorno($sql);
+		$dato = mysqli_fetch_array($result);
+		return $dato;
+	}
+
+	public function aplicarjuego($facturas){
+		$sql = "SELECT fn_aplicarjuego('".$facturas."');";
+		$result = $this->conexion->consultaRetorno($sql);
+		$dato = mysqli_fetch_array($result);
+		return $dato;
+	}
+
+	public function aplicarpremio($premio){
+		$sql = "SELECT fn_aplicapremio('".$premio."');";
+		$result = $this->conexion->consultaRetorno($sql);
+		$dato = mysqli_fetch_array($result);
+		return $dato;
+	}
+
 	public function convertToclassjuego($result)
 	{
 		$classjuego = new classjuego();

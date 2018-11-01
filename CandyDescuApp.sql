@@ -35,6 +35,26 @@ insert  into `cd_cliente_tb`(`cd_cli_cedula`,`cd_cli_nombre`,`cd_cli_ape1`,`cd_c
 (504050029,'Mauricio','Chevez','Gutierrez','A'),
 (504080437,'Alberth','Espinoza','Ortiz','A');
 
+/*Table structure for table `cd_clientefactura_tb` */
+
+DROP TABLE IF EXISTS `cd_clientefactura_tb`;
+
+CREATE TABLE `cd_clientefactura_tb` (
+  `cd_cli_cedula` int(11) DEFAULT NULL,
+  `cd_fac_numfactura` int(11) DEFAULT NULL,
+  KEY `fk_cli_cedula` (`cd_cli_cedula`),
+  KEY `fk_fac_numfactura` (`cd_fac_numfactura`),
+  CONSTRAINT `fk_cli_cedula` FOREIGN KEY (`cd_cli_cedula`) REFERENCES `cd_cliente_tb` (`cd_cli_cedula`),
+  CONSTRAINT `fk_fac_numfactura` FOREIGN KEY (`cd_fac_numfactura`) REFERENCES `cd_factura_tb` (`cd_fac_numfactura`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `cd_clientefactura_tb` */
+
+insert  into `cd_clientefactura_tb`(`cd_cli_cedula`,`cd_fac_numfactura`) values 
+(504080437,1),
+(504080437,2),
+(504080437,3);
+
 /*Table structure for table `cd_factura_tb` */
 
 DROP TABLE IF EXISTS `cd_factura_tb`;
@@ -42,16 +62,15 @@ DROP TABLE IF EXISTS `cd_factura_tb`;
 CREATE TABLE `cd_factura_tb` (
   `cd_fac_numfactura` int(11) NOT NULL,
   `cd_fac_fecha` date DEFAULT NULL,
-  `cd_cli_cedula` int(11) DEFAULT NULL,
-  PRIMARY KEY (`cd_fac_numfactura`),
-  KEY `cd_factura_cedula_tb` (`cd_cli_cedula`),
-  CONSTRAINT `cd_factura_cedula_tb` FOREIGN KEY (`cd_cli_cedula`) REFERENCES `cd_cliente_tb` (`cd_cli_cedula`)
+  PRIMARY KEY (`cd_fac_numfactura`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cd_factura_tb` */
 
-insert  into `cd_factura_tb`(`cd_fac_numfactura`,`cd_fac_fecha`,`cd_cli_cedula`) values 
-(1,'2018-10-02',504080437);
+insert  into `cd_factura_tb`(`cd_fac_numfactura`,`cd_fac_fecha`) values 
+(1,'2018-10-31'),
+(2,'2018-10-31'),
+(3,'2018-10-31');
 
 /*Table structure for table `cd_historialjuego_tb` */
 
@@ -188,19 +207,6 @@ DELIMITER $$
 
 DELIMITER ;
 
-/* Trigger structure for table `cd_factura_tb` */
-
-DELIMITER $$
-
-/*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `cd_historialjuego_tb_ai` */$$
-
-/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'localhost' */ /*!50003 TRIGGER `cd_historialjuego_tb_ai` AFTER INSERT ON `cd_factura_tb` FOR EACH ROW BEGIN
-	insert into `cd_historialjuego_tb` SET `cd_fac_numfactura` = NEW.`cd_fac_numfactura`;
-    END */$$
-
-
-DELIMITER ;
-
 /* Trigger structure for table `cd_info_usu_td` */
 
 DELIMITER $$
@@ -257,6 +263,68 @@ BEGIN
   end if;
   
   return vAcceso;
+END */$$
+DELIMITER ;
+
+/* Function  structure for function  `fn_aplicapremio` */
+
+/*!50003 DROP FUNCTION IF EXISTS `fn_aplicapremio` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `fn_aplicapremio`(
+  numpremio int(11)
+  ) RETURNS varchar(11) CHARSET latin1
+BEGIN
+  DECLARE NoMoreRow INTEGER DEFAULT 0;
+  DECLARE vVerificar VARCHAR(1);
+  DECLARE cVerificar CURSOR FOR
+  SELECT `cd_id_premio`
+  FROM `cd_premios_tb`
+  WHERE `cd_premios_tb`.`cd_id_premio` = numpremio;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET NoMoreRow = 1;
+  OPEN cVerificar;
+  myloop : LOOP
+	FETCH cVerificar INTO vVerificar;
+	IF NoMoreRow = 1 THEN
+		LEAVE myloop;
+	END IF;
+  END LOOP myloop;
+  CLOSE cVerificar;
+  IF vVerificar IS NULL THEN
+	SELECT 0 INTO vVerificar;
+  END IF;
+  RETURN vVerificar;
+END */$$
+DELIMITER ;
+
+/* Function  structure for function  `fn_aplicarjuego` */
+
+/*!50003 DROP FUNCTION IF EXISTS `fn_aplicarjuego` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `fn_aplicarjuego`(
+  factura int(11)
+  ) RETURNS varchar(1) CHARSET latin1
+BEGIN
+  DECLARE NoMoreRow INTEGER DEFAULT 0;
+  DECLARE vVerificar VARCHAR(1);
+  DECLARE cVerificar CURSOR FOR
+  SELECT 'S'
+  FROM `cd_factura_tb`
+  WHERE `cd_factura_tb`.`cd_fac_numfactura` = factura;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET NoMoreRow = 1;
+  OPEN cVerificar;
+  myloop : LOOP
+	FETCH cVerificar INTO vVerificar;
+	IF NoMoreRow = 1 THEN
+		LEAVE myloop;
+	END IF;
+  END LOOP myloop;
+  CLOSE cVerificar;
+  IF vVerificar IS NULL THEN
+	SELECT 'N' INTO vVerificar;
+  END IF;
+  RETURN vVerificar;
 END */$$
 DELIMITER ;
 
@@ -390,6 +458,37 @@ BEGIN
 END */$$
 DELIMITER ;
 
+/* Function  structure for function  `fn_verificar_cliente` */
+
+/*!50003 DROP FUNCTION IF EXISTS `fn_verificar_cliente` */;
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` FUNCTION `fn_verificar_cliente`(
+  cedula int(11)
+  ) RETURNS varchar(1) CHARSET latin1
+BEGIN
+  declare NoMoreRow integer default 0;
+  declare vVerificar varchar(1);
+  declare cVerificar cursor for
+  select 'S'
+  from `cd_cliente_tb`
+  where `cd_cliente_tb`.`cd_cli_cedula` = cedula;
+  declare continue handler for not found set NoMoreRow = 1;
+  open cVerificar;
+  myloop : loop
+	fetch cVerificar into vVerificar;
+	if NoMoreRow = 1 then
+		leave myloop;
+	end if;
+  end loop myloop;
+  close cVerificar;
+  if vVerificar is null then
+	select 'N' into vVerificar;
+  end if;
+  return vVerificar;
+END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `sp_cd_cambiarclave` */
 
 /*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_cambiarclave` */;
@@ -479,6 +578,22 @@ BEGIN
 SELECT `cd_cli_cedula`,`cd_cli_nombre`,`cd_cli_ape1`,`cd_cli_ape2`
  FROM `cd_cliente_tb`
  WHERE `cd_cliente_tb`.`cd_estado` = 'A';
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_factura_guardar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_factura_guardar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_factura_guardar`(
+  in cedula int(11),
+  in factura int(11)  
+  )
+BEGIN
+  INSERT INTO `cd_factura_tb` (`cd_fac_numfactura`,`cd_fac_fecha`) VALUES(factura, NULL);
+  insert into `cd_clientefactura_tb`(`cd_cli_cedula`,`cd_fac_numfactura`) values (cedula, factura);
 END */$$
 DELIMITER ;
 
