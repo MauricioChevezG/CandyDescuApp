@@ -115,6 +115,7 @@ class classloginController {
 						$this->classlogin->setAtributo('usuarios',$_POST['usuarios']);
 						$this->classlogin->setAtributo('claves',$_POST['claves']);
 						$this->classlogin->cambiar_clave($_POST['correos'],$_POST['usuarios'],$_POST["claves"]);
+						echo ".";
 						?>
 							<script>
 								alertify.alert('Alerta','Se cambio la nueva clave', function(){ 
@@ -123,13 +124,13 @@ class classloginController {
 								});
 							</script>
 						<?php
-						require_once 'view/login.php';
 					} else {
 						require_once 'view/login.php';
 					}
 				}
 			}
 			catch (Exception $e) {
+				echo ".";
 				?>
 				<script>
 					alertify.alert('Alerta','Se cambio la nueva clave', function(){ 
@@ -155,20 +156,21 @@ class classloginController {
 						if ($this->classlogin->entrar($_POST['usuario'],$_POST['clave']) == true) {
 							session_start();
 							if ($_SESSION['idpuesto'] == 1) {
-								header("Location: ?c=classprincipal&m=index");	
+								header("Location: ?c=classprincipal&m=index");
 							} else if ($_SESSION['idpuesto'] == 2){
 								header("Location: ?c=classprincipal&m=index");
 							} else  if ($_SESSION['idpuesto'] == 3) {
-								header("Location: ?c=classprincipal&m=index");								
+								header("Location: ?c=classprincipal&m=index");	
 							} else if ($_SESSION['idpuesto'] == 4) {
 								header("Location: ?c=classprincipal&m=index");
 							} else {
-								header("Location: ?c=class03puestos&m=index");
+								header("Location: ?c=classinicio&m=index");
 							}
 						} else {
+							echo ".";
 							?>
 							<script>
-								alertify.alert("Alerta",'Usuario y Clave son incorrectos', function(){ 
+								alertify.alert("Alerta","Usuario y Clave son incorrectos", function(){ 
 									alertify.success('Ok');
 									location.href = "?c=classlogin&m=index"; 
 								});
@@ -181,11 +183,12 @@ class classloginController {
 				}
 			}
 			catch (Exception $e) {
+				echo ".";
 				?>
 				<script>
 					alertify.alert('Alerta','Usuario y Clave estan vacios', function(){ 
-						location.href = "?c=classlogin&m=index";
-						alertify.success('Ok'); 
+						alertify.success('Ok');
+						location.href = "?c=classlogin&m=index"; 
 					});
 				</script>
 				<?php

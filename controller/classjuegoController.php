@@ -9,6 +9,7 @@ class classjuegoController
 	private $classjuego;
 	private $cedula;
 	private $juego;
+	private $reporte;
 
 	function __construct() {
 		$this->classjuego =  new classjuego();
@@ -68,51 +69,9 @@ class classjuegoController
 	public function ganaPremio(){
 		$this->classjuego->setAtributo('cd_id_premio',$_REQUEST['id']);
 		$dato = $this->classjuego->getAtributo('cd_id_premio');
-		$premio = $this->classjuego->aplicarpremio($dato);
-		if ($premio[0] == '0') {
-			?>
-				<script>
-					alert('Gano','Confite');
-				</script>
-			<?php
-		} elseif ($premio[0] == '1') {
-			?>
-				<script>
-					alertify.alert('Gano','1');
-				</script>
-			<?php
-		} elseif ($premio[0] == '2') {
-			?>
-				<script>
-					alertify.alert('Gano','2');
-				</script>
-			<?php
-		} elseif ($premio[0] == '3') {
-			?>
-				<script>
-					alertify.alert('Gano','3');
-				</script>
-			<?php
-		} elseif ($premio[0] == '4') {
-			?>
-				<script>
-					alertify.alert('Gano','4');
-				</script>
-			<?php
-		} elseif ($premio[0] == '5') {
-			?>
-				<script>
-					alertify.alert('Gano','5');
-				</script>
-			<?php
-		} elseif ($premio[0] == '6') {
-			?>
-				<script>
-					alertify.alert('Gano','6');
-				</script>
-			<?php
-		}
-		
+		//$premio = $this->classjuego->aplicarpremio($dato);
+		$this->classjuego->reporte_premio($dato);
+		header('Location: ?c=classreportepremios&m=index');
 	}
 }
  ?>

@@ -68,9 +68,9 @@ CREATE TABLE `cd_factura_tb` (
 /*Data for the table `cd_factura_tb` */
 
 insert  into `cd_factura_tb`(`cd_fac_numfactura`,`cd_fac_fecha`) values 
-(1,'2018-10-31'),
-(2,'2018-10-31'),
-(3,'2018-10-31');
+(1,'2018-11-02'),
+(2,'2018-11-02'),
+(3,'2018-11-02');
 
 /*Table structure for table `cd_historialjuego_tb` */
 
@@ -87,9 +87,6 @@ CREATE TABLE `cd_historialjuego_tb` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 /*Data for the table `cd_historialjuego_tb` */
-
-insert  into `cd_historialjuego_tb`(`cd_hi_id`,`cd_usu_cedula`,`cd_cli_cedula`,`cd_fac_numfactura`,`cd_fac_fecha`,`cd_hi_numcomprobante`) values 
-(0,NULL,NULL,1,NULL,NULL);
 
 /*Table structure for table `cd_info_usu_td` */
 
@@ -139,7 +136,13 @@ CREATE TABLE `cd_premios_tb` (
 /*Data for the table `cd_premios_tb` */
 
 insert  into `cd_premios_tb`(`cd_id_premio`,`cd_des_premio`,`cd_decuento_premio`) values 
-(1,'premio 01','20');
+(0,'Confite','0'),
+(1,'Premio 01','5'),
+(2,'Premio 02','15'),
+(3,'Premio 03','10'),
+(4,'Premio 04','20'),
+(5,'Premio 05','25'),
+(6,'Premio 06','30');
 
 /*Table structure for table `cd_puestos_tb` */
 
@@ -156,9 +159,26 @@ CREATE TABLE `cd_puestos_tb` (
 
 insert  into `cd_puestos_tb`(`cd_usu_idpuesto`,`cd_descripcion_pues`,`cd_estado`) values 
 (1,'Administrador','A'),
-(2,'Cajero','A'),
-(3,'wee','I'),
-(4,'Corredor','A');
+(2,'Cajero','A');
+
+/*Table structure for table `cd_reporte_premio` */
+
+DROP TABLE IF EXISTS `cd_reporte_premio`;
+
+CREATE TABLE `cd_reporte_premio` (
+  `cd_r_factura` int(11) DEFAULT NULL,
+  `cd_r_des_premio` varchar(50) DEFAULT NULL,
+  `cd_r_premio` varchar(50) DEFAULT NULL,
+  `cd_r_estado` varchar(1) DEFAULT NULL,
+  KEY `cd_r_cons` (`cd_r_factura`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/*Data for the table `cd_reporte_premio` */
+
+insert  into `cd_reporte_premio`(`cd_r_factura`,`cd_r_des_premio`,`cd_r_premio`,`cd_r_estado`) values 
+(1,'Confite','0','I'),
+(2,'Confite','0','I'),
+(3,NULL,NULL,'I');
 
 /*Table structure for table `cd_usuario_tb` */
 
@@ -202,6 +222,7 @@ DELIMITER $$
     IF NEW.cd_fac_fecha is null then
 	SET NEW.cd_fac_fecha = SYSDATE();
     end if;
+    insert into `cd_reporte_premio`(`cd_r_factura`) values (NEW.cd_fac_numfactura);
   END */$$
 
 
@@ -229,6 +250,22 @@ DELIMITER $$
 /*!50003 CREATE */ /*!50017 DEFINER = 'root'@'localhost' */ /*!50003 TRIGGER `cd_puesto` BEFORE INSERT ON `cd_puestos_tb` FOR EACH ROW BEGIN
 	SET new.`cd_estado` = 'A';
     END */$$
+
+
+DELIMITER ;
+
+/* Trigger structure for table `cd_reporte_premio` */
+
+DELIMITER $$
+
+/*!50003 DROP TRIGGER*//*!50032 IF EXISTS */ /*!50003 `cd_reporte_premio_bi` */$$
+
+/*!50003 CREATE */ /*!50017 DEFINER = 'root'@'localhost' */ /*!50003 TRIGGER `cd_reporte_premio_bi` BEFORE INSERT ON `cd_reporte_premio` FOR EACH ROW 
+BEGIN
+  IF NEW.`cd_r_estado` IS NULL THEN
+	SET NEW.`cd_r_estado` = 'A';
+  END IF;
+END */$$
 
 
 DELIMITER ;
@@ -620,6 +657,64 @@ BEGIN
 END */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `sp_cd_premios_buscar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_premios_buscar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_premios_buscar`(id_premio INT(11))
+BEGIN
+	SELECT `cd_id_premio`,`cd_des_premio`,`cd_decuento_premio`
+		FROM `cd_premios_tb`
+			WHERE`cd_id_premio`=id_premio;
+    END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_premios_editar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_premios_editar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_premios_editar`(id_premio INT(11), des_premio VARCHAR(50),
+ des_descuento_premio VARCHAR(50))
+BEGIN
+    UPDATE `cd_premios_tb` 
+	SET `cd_des_premio` = des_premio,
+	 `cd_decuento_premio` = des_descuento_premio
+     WHERE `cd_id_premio` = id_premio;
+    END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_premios_eliminar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_premios_eliminar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_premios_eliminar`(id_premio INT(11))
+BEGIN
+
+	DELETE FROM `cd_premios_tb`
+		WHERE `cd_id_premio` = id_premio;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_premios_guardar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_premios_guardar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_premios_guardar`(id_premio INT(11), des_premio VARCHAR(50),
+ des_descuento_premio VARCHAR(50))
+BEGIN
+	INSERT INTO `cd_premios_tb`(`cd_id_premio`,`cd_des_premio`,`cd_decuento_premio`) 
+		VALUES (id_premio,des_premio,des_descuento_premio);	
+    END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `sp_cd_premios_listar` */
 
 /*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_premios_listar` */;
@@ -726,6 +821,37 @@ BEGIN
 END */$$
 DELIMITER ;
 
+/* Procedure structure for procedure `sp_cd_reporte_factura_eliminar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_reporte_factura_eliminar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_reporte_factura_eliminar`(
+  in idfactura int(11)  
+  )
+BEGIN
+  update `cd_reporte_premio` 
+  set `cd_r_estado` = 'I'
+  where `cd_r_factura` = idfactura;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_reporte_premio_listar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_reporte_premio_listar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_reporte_premio_listar`(
+  )
+BEGIN
+  SELECT `cd_r_factura`,`cd_r_des_premio`,`cd_r_premio` 
+  FROM `cd_reporte_premio`
+  WHERE `cd_r_estado` = 'A';
+END */$$
+DELIMITER ;
+
 /* Procedure structure for procedure `sp_cd_usuario_info_tb_buscar` */
 
 /*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_usuario_info_tb_buscar` */;
@@ -762,6 +888,84 @@ UPDATE `cd_info_usu_td`
 UPDATE `cd_usuario_tb`
  SET `cd_usuario_tb`.`cd_estado` = 'I'
  WHERE `cd_usuario_tb`.`cd_usu_cedula` = CED;
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_reporte_datos` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_reporte_datos` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_reporte_datos`(
+  in IDFactura int(11) 
+  )
+BEGIN
+ SELECT  `cd_factura_tb`.`cd_fac_numfactura`,
+	  `cd_factura_tb`.`cd_fac_fecha`,
+	  `cd_cliente_tb`.`cd_cli_nombre`,
+	  `cd_cliente_tb`.`cd_cli_ape1`,
+	  `cd_cliente_tb`.`cd_cli_ape2`,
+	  `cd_reporte_premio`.`cd_r_des_premio`,
+	  `cd_reporte_premio`.`cd_r_premio`
+ FROM `cd_reporte_premio`
+  INNER JOIN `cd_factura_tb` ON `cd_factura_tb`.`cd_fac_numfactura` = `cd_reporte_premio`.`cd_r_factura`
+ 
+  INNER JOIN `cd_clientefactura_tb` ON `cd_clientefactura_tb`.`cd_fac_numfactura` = `cd_factura_tb`.`cd_fac_numfactura`
+ 
+  INNER JOIN `cd_cliente_tb` ON `cd_cliente_tb`.`cd_cli_cedula` = `cd_clientefactura_tb`.`cd_cli_cedula`
+ 
+  WHERE `cd_reporte_premio`.`cd_r_factura` = IDFactura
+  AND `cd_reporte_premio`.`cd_r_estado` = 'A';
+END */$$
+DELIMITER ;
+
+/* Procedure structure for procedure `sp_cd_reporte_premio_guardar` */
+
+/*!50003 DROP PROCEDURE IF EXISTS  `sp_cd_reporte_premio_guardar` */;
+
+DELIMITER $$
+
+/*!50003 CREATE DEFINER=`root`@`localhost` PROCEDURE `sp_cd_reporte_premio_guardar`(
+  IN vIdPremio INT(11)
+  )
+BEGIN
+  DECLARE vNoMoreRow INTEGER DEFAULT 0;
+  DECLARE vDespremio VARCHAR(50);
+  DECLARE vPremio VARCHAR(50);
+  declare vFactura int(11);  
+  
+  declare cFactura cursor for
+  select `cd_r_factura`
+  from `cd_reporte_premio`
+  where `cd_r_estado` = 'A';
+  
+  DECLARE cPremio CURSOR FOR 
+  SELECT `cd_des_premio`, `cd_decuento_premio` 
+  FROM `cd_premios_tb`
+  WHERE `cd_id_premio` = vIdPremio;
+  DECLARE CONTINUE HANDLER FOR NOT FOUND SET vNoMoreRow = 1;
+  OPEN cPremio;
+  myloop : LOOP
+	FETCH cPremio INTO vDespremio, vPremio;
+	IF vNoMoreRow = 1 THEN
+		LEAVE myloop;
+	END IF;
+  END LOOP myloop;
+  CLOSE cPremio;
+  open cFactura;
+  myloop : LOOP
+	FETCH cFactura INTO vFactura;
+	IF vNoMoreRow = 1 THEN
+		LEAVE myloop;
+	END IF;
+  END LOOP myloop;
+  close cFactura;
+  
+  update `cd_reporte_premio` 
+  set `cd_r_des_premio` = vDespremio,
+  `cd_r_premio` = vPremio
+  where `cd_r_factura` = vFactura;
 END */$$
 DELIMITER ;
 

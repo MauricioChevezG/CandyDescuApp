@@ -34,6 +34,23 @@
     }
   }
   </style>
+  <?php 
+    session_start();
+    if(isset($_SESSION['usuario']) && isset($_SESSION['puesto']) && isset($_SESSION['idpuesto'])) {
+      $usuario = $_SESSION['usuario'];
+      $puesto = $_SESSION['puesto'];
+      $idpuesto = $_SESSION['idpuesto'];
+      ?>
+      <div id="usu" style="display: none;">
+        <?php 
+          echo htmlspecialchars($usuario);
+         ?>
+      </div>
+      <?php
+    } else {
+      header("Location: ?c=classlogin&m=index");
+    }
+  ?>
 </head>
 <body>
   <nav class="navbar navbar-inverse">
@@ -42,35 +59,50 @@
         <a class="navbar-brand" href="?c=classprincipal&m=index">CandyDescu</a>
       </div>
       <ul class="nav navbar-nav">
-        <li class="active"><a href="?c=classprincipal&m=index">Inicio</a></li>
+        <!--<li class="active"><a href="?c=classprincipal&m=index">Inicio</a></li>-->
         <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Menu<span class="caret"></span></a>
           <ul class="dropdown-menu">
+            <?php 
+              if ($idpuesto == 1) :
+             ?>
             <li><a href="?c=classusuarios"><span class="glyphicon glyphicon-wrench"></span> Usuarios</a></li>
+            <?php 
+              endif;
+             ?>
             <li><a href="?c=classCliente"><span class="glyphicon glyphicon-wrench"></span> Clientes</a></li>
+            <?php 
+              if ($idpuesto == 1) :
+             ?>
             <li><a href="?c=classpuestos"><span class="glyphicon glyphicon-wrench"></span> Puestos</a></li>
+            <?php 
+              endif;
+             ?>
+             <?php 
+              if ($idpuesto == 1) :
+             ?>
+            <li><a href="?c=classpremios"><span class="glyphicon glyphicon-wrench"></span> Premios</a></li>
+            <?php 
+              endif;
+             ?>
           </ul>
         </li>
         <li><a href="?c=classjuego&m=index1">Verificar</a></li>
+        <?php 
+          if ($idpuesto == 1) :
+         ?>
         <li><a href="?c=classjuego">Juego</a></li>
+        <?php 
+          endif;
+         ?>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
           <a>
-            <span class="glyphicon glyphicon-user">
-              <?php 
-              session_start();
-              if(isset($_SESSION['usuario']) && isset($_SESSION['puesto'])) {
-              $usuario = $_SESSION['usuario'];
-               echo($usuario);
-               $puesto = $_SESSION['puesto'];
-
-              } else {
-                header("Location: ?c=classlogin&m=index");
-              }
-              ?>
-               | 
-              <?php 
-               echo($puesto);
+            <span class="glyphicon glyphicon-user"> 
+              <?php
+                echo($usuario);
+                echo " | ";
+                echo($puesto);
               ?>
             </span>
           </a>
@@ -79,13 +111,4 @@
       </ul>
     </div>
   </nav>
-    
   <div class="container-fluid ">
-	      
-	  
-            
-
-
-
-
-  

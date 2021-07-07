@@ -7,7 +7,7 @@
     </div>
     <div class="col-sm-4"> 
       <img src="assets/img/tec.jpg" class="img-responsive" style="width:100%" alt="Image">
-      <p>Solución el la nube.</p>    
+      <p>Solución en la nube.</p>    
     </div>
     <div class="col-sm-4">
       <div class="well">

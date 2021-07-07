@@ -45,7 +45,10 @@
                                 <input class="form-control" placeholder="Contraseña" id="clave" name="clave" type="password">
                                 <br>
                                 <a data-toggle="modal" data-target="#ModalLogin">Cambiar Contraseña?</a>
-                                <input class="btn btn-lg btn-success btn-block" type="submit" name="submit" id="submit" value="Iniciar Sesión">
+                                <br>
+                                <div class="form-group">
+                                  <input class="btn btn-lg btn-success btn-block" type="submit" name="submit" id="submit" value="Iniciar Sesión">
+                                </div>
                             </fieldset>
                         </form>
                     </div>

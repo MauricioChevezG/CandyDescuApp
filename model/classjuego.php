@@ -84,6 +84,11 @@ class classjuego  extends Conexion
 		return $dato;
 	}
 
+	public function reporte_premio($idpremio){
+		$sql = "CALL sp_cd_reporte_premio_guardar('".$idpremio."');";
+		$this->conexion->consultaSimple($sql);
+	}
+
 	public function convertToclassjuego($result)
 	{
 		$classjuego = new classjuego();

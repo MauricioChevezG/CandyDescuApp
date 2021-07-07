@@ -54,6 +54,7 @@
             alertify.success('Ok');
             location.href = '?c=classjuego&m=ganaPremio&id='+a;
            });
+           console.log(a);
        }
        function dibujarIndicador() {
             var ctx = miRuleta.ctx;
